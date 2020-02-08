@@ -1,0 +1,54 @@
+version: '3.7'
+services:
+  # backend service
+  ppmtool-server:
+    build: .
+    image: ppmtool
+    networks:
+      - backend
+      - frontend
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    container_name: ppmtool-server
+    environment: # root user are not accessible from outside "localhost" - need to connect directly
+      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/ppmtooldatabase?serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: foobar
+
+  # frontend service
+  ppmtool-client:
+    build:
+      context: ../ppmtool-react-client/
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - ppmtool-server
+    container_name: ppmtool-client
+    networks:
+      - frontend
+
+  # mySQL database
+  database:
+    image: mysql
+    ports:
+      - 3306
+    networks:
+      - backend
+    container_name: ppmtool-db
+    environment:
+      - MYSQL_DATABASE=ppmtooldatabase
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=foobar
+      - MYSQL_ROOT_PASSWORD=foobar
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:
+
+networks:
+  backend:
+  frontend:
