@@ -2,7 +2,9 @@ version: '3.7'
 services:
   # backend service
   ppmtool-server:
-    build: .
+    build:
+      context: ./ppmtool-spring-boot/
+      dockerfile: Dockerfile
     image: ppmtool
     networks:
       - backend
@@ -20,7 +22,7 @@ services:
   # frontend service
   ppmtool-client:
     build:
-      context: ../ppmtool-react-client/
+      context: ./ppmtool-react-client/
       dockerfile: Dockerfile
     ports:
       - 3000:3000
@@ -29,6 +31,7 @@ services:
     container_name: ppmtool-client
     networks:
       - frontend
+
 
   # mySQL database
   database:
